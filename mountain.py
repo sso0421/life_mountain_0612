@@ -603,18 +603,19 @@ elif st.session_state.page == "result":
 
     st.markdown("---")
     # 추천 코스 및 거리/시간 통합 가이드 박스 레이아웃
+    # [디자인 전면 개정] 대시보드 테마와 조화를 이루는 연초록 글래스모피즘 가이드 카드
     st.markdown(f"""
-    <div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 25px;">
-        <h3 style="margin-top: 0; color: #2C5E3B; font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center;">
-            <span style="margin-right: 8px;">🥾</span> 추천 등산 코스
+    <div style="background-color: rgba(241, 246, 242, 0.85); border-left: 6px solid #2C5E3B; border-radius: 10px; padding: 22px 26px; box-shadow: 0 4px 12px rgba(44, 94, 59, 0.05); margin-bottom: 25px;">
+        <h3 style="margin-top: 0; color: #2C5E3B; font-size: 1.35rem; font-weight: 800; margin-bottom: 18px; display: flex; align-items: center;">
+            <span style="margin-right: 8px; font-size: 1.5rem;">🥾</span> 추천 등산 코스
         </h3>
-        <div style="margin-bottom: 16px;">
-            <span style="font-weight: 700; color: #4A5568; font-size: 1.05rem; display: inline-block; width: 100px;">코스 :</span>
-            <span style="color: #2D3748; font-size: 1.05rem;">{rec_row['추천코스']}</span>
+        <div style="margin-bottom: 12px; line-height: 1.6; color: #2F4F4F; font-size: 1.05rem;">
+            <strong style="color: #2C5E3B;">코스 :</strong> 
+            <span style="margin-left: 6px; font-weight: 500;">{rec_row['추천코스']}</span>
         </div>
-        <div>
-            <span style="font-weight: 700; color: #4A5568; font-size: 1.05rem; display: inline-block; width: 100px;">거리 및 시간 :</span>
-            <span style="color: #2D3748; font-size: 1.05rem;">{rec_row['코스왕복거리_시간']}</span>
+        <div style="line-height: 1.6; color: #2F4F4F; font-size: 1.05rem;">
+            <strong style="color: #2C5E3B;">거리 및 시간 :</strong> 
+            <span style="margin-left: 6px; font-weight: 500;">{rec_row['코스왕복거리_시간']}</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
