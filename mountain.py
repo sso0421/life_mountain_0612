@@ -169,9 +169,8 @@ def find_image_path(region, mountain_name):
 
 # [디자인/기능 전면 개정] 요청된 고유 색상 매핑이 적용된 다중 마우스 오버 툴팁 시스템
 def render_donut_chart(df, region_filter=None):
-    # [수정] 요청하신 새로운 고유 색상 코드로 도넛 데이터 및 범례 매핑 변경
     categories = ["재물", "건강", "행복", "성공", "애정"]
-    colors = ["#F7D200", "#8600AF", "#007C06", "#055FBE", "#FF699B"] # 노랑, 보라(수정됨), 초록, 파랑, 분홍
+    colors = ["#F7D200", "#8600AF", "#007C06", "#055FBE", "#FF699B"] # 노랑, 보라, 초록, 파랑, 분홍
     
     if df.empty or "테스트결과값" not in df.columns:
         return "<div style='text-align: center; color: #888888; padding: 40px 0; font-family: sans-serif; font-weight: 500;'>수집된 데이터가 없습니다.</div>"
@@ -320,13 +319,13 @@ if st.session_state.page == "intro":
     <div class="desc-box">
         <h4 style="margin-top:0; color:#2C5E3B;">📋 테스트 설명</h4>
         <p style="margin:0; font-size:1.05rem; line-height:1.6; color:#2F4F4F;">
-            나에게 필요한 기운을 채워 줄 <b>산 추천</b>과 더불어, <br>
+            당신에게 필요한 기운을 채워 줄 <b>산 추천</b>과 더불어, <br>
             답답한 일상을 리프레시할 <b>등산 코스, 주변 맛집, 행운의 아이템 추천</b>까지 한 번에 만나보세요!
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("테스트 시작하기 🥾", use_container_width=True):
+    if st.button("테스트 시작하기", use_container_width=True):
         st.session_state.page = "info"
         st.rerun()
 
@@ -360,7 +359,7 @@ elif st.session_state.page == "info":
     region_input = st.radio(f"Q4. {q4_row['질문내용']}", options=q4_opts, index=default_region_idx, key="info_region")
     
     st.markdown("---")
-    if st.button("다음 단계로 이동 ➡️"):
+    if st.button("다음 단계로 이동 >"):
         if not name_input.strip():
             st.warning("이름 또는 별명을 꼭 입력해 주세요.")
         elif gender_input is None:
@@ -424,7 +423,14 @@ elif st.session_state.page == "test":
                 energy_type = CATEGORY_MAPPING.get(col_name, "기타")
                 options_map[text] = energy_type
         
-        options_list = list(options_map.keys())
+        # [수정] 질문별로 선택 답안의 순서를 랜덤하게 섞음 (페이지 Rerun 시 순서가 유지되도록 세션 상태 사용)
+        shuffle_key = f"shuffled_options_{q_num}"
+        if shuffle_key not in st.session_state:
+            raw_options = list(options_map.keys())
+            random.shuffle(raw_options)
+            st.session_state[shuffle_key] = raw_options
+            
+        options_list = st.session_state[shuffle_key]
         
         default_index = None
         if q_num in st.session_state.test_selected_texts:
@@ -433,7 +439,7 @@ elif st.session_state.page == "test":
                 default_index = options_list.index(saved_text)
                 
         selected_text = st.radio(
-            "마음에 드는 항목을 하나 선택하세요:",
+            "마음에 드는 항목을 하나 선택하세요.",
             options=options_list,
             index=default_index,
             key=f"test_q_{q_num}"
@@ -446,16 +452,16 @@ elif st.session_state.page == "test":
         
         with col_prev:
             if current_idx == 0:
-                if st.button("⬅️ 처음으로"):
+                if st.button("<< 처음으로"):
                     st.session_state.page = "info"
                     st.rerun()
             elif current_idx > 0:
-                if st.button("⬅️ 이전 문항"):
+                if st.button("< 이전 문항"):
                     st.session_state.current_q_idx -= 1
                     st.rerun()
                     
         with col_next:
-            btn_label = "결과 분석하기 🏆" if is_last else "다음 문항으로 ➡️"
+            btn_label = "결과 분석하기" if is_last else "다음 문항으로 >"
             
             if st.button(btn_label):
                 if selected_text is None:
@@ -520,9 +526,8 @@ elif st.session_state.page == "result":
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### 📊 나의 5가지 균형 점수")
+    st.markdown("### 나의 5가지 균형 점수")
     
-    # [수정] 5가지 개별 균형 스코어 카드에도 요청하신 고유 색상 매핑 동기화 처리
     card_config = {
         "건강": {"icon": "💪", "color": "#8600AFFF"},
         "행복": {"icon": "🍀", "color": "#007C06FF"},
@@ -558,7 +563,7 @@ elif st.session_state.page == "result":
             
     st.markdown("---")
     
-    st.markdown("### 📈 다른 유저들은 어떤 기운이 부족할까요?")
+    st.markdown("### 다른 유저들은 어떤 기운이 부족할까요?")
     
     db_df = pd.DataFrame()
     if os.path.exists("result_DB.xlsx"):
@@ -567,7 +572,6 @@ elif st.session_state.page == "result":
         except:
             pass
             
-    # [요청하신 레이아웃 영역] 변경된 색상으로 자동 드로잉되는 도넛 차트 컴포넌트 호출
     col_graph1, col_graph2 = st.columns(2)
     with col_graph1:
         st.markdown("<h4 style='text-align: center; color: #2C5E3B; margin-bottom: 5px;'>🌍 전체 지역 기준</h4>", unsafe_allow_html=True)
@@ -586,14 +590,14 @@ elif st.session_state.page == "result":
     with col_visual:
         img_file_path = find_image_path(info['region'], rec_mountain)
         if img_file_path:
-            st.image(img_file_path, use_container_width=True, caption=f"🏔️ {info['region']} {rec_mountain}")
+            st.image(img_file_path, use_container_width=True, caption=f"{info['region']} {rec_mountain}")
         else:
-            st.info(f"📍 [이미지 준비 중]\nmountain/{info['region']}/{rec_mountain}")
+            st.info(f"[이미지 준비 중]\nmountain/{info['region']}/{rec_mountain}")
 
     with col_content:
-        st.markdown(f"### 🏔️ 추천 명산: **{rec_mountain}**")
+        st.markdown(f"### 추천 명산: **{rec_mountain}**")
         if '위치_고도' in rec_row and pd.notna(rec_row['위치_고도']):
-            st.caption(f"📍 위치/고도: {rec_row['위치_고도']}")
+            st.caption(f"위치/고도: {rec_row['위치_고도']}")
             
         st.markdown("**💡 산의 기운**")
         st.write(rec_row['카테고리설명'])
@@ -627,16 +631,20 @@ elif st.session_state.page == "result":
     col_rest, col_lucky = st.columns(2)
     with col_rest:
         st.markdown("🍕 **산악 매칭 추천 맛집**")
-        st.warning(f"🍽️ **{rec_row['맛집']}**")
+        st.warning(f"**{rec_row['맛집']}**")
         
     with col_lucky:
         st.markdown("🍀 **오늘의 행운의 아이템**")
-        st.info(f"✨ **{selected_lucky_item}**")
+        st.info(f"**{selected_lucky_item}**")
     
     st.markdown("---")
-    if st.button("🔄 테스트 다시 참여하기"):
+    if st.button("테스트 다시 참여하기"):
         for k in ["info_data", "test_answers", "test_selected_texts", "current_q_idx", "db_saved"]:
             if k in st.session_state:
                 del st.session_state[k]
+        # [수정] 테스트 다시 참여 시 셔플된 선택지 목록도 초기화
+        keys_to_del = [k for k in st.session_state.keys() if k.startswith("shuffled_options_")]
+        for k in keys_to_del:
+            del st.session_state[k]
         st.session_state.page = "intro"
         st.rerun()
