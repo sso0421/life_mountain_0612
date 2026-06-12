@@ -407,9 +407,8 @@ elif st.session_state.page == "test":
         
         st.markdown(f"""
         <div style='text-align: center; margin-bottom: 25px;'>
-            <div style='font-size: 1.1rem; color: #2C5E3B; font-weight: bold;'>진행도: {display_q_num} / {total_q_count}</div>
+            <div style='font-size: 2.2rem; letter-spacing: 2px;'>{passed_path}🕺{remaining_path}</div>
             <div style='font-size: 0.95rem; color: #555555; margin-top: 3px; margin-bottom: 8px; font-weight: 500;'>현재 상태: {progress_icon}</div>
-            <div style='font-size: 2.2rem; letter-spacing: 2px;'>{passed_path}🚶‍♂️{remaining_path}</div>
         </div>
         """, unsafe_allow_html=True)
         
